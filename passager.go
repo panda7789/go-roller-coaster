@@ -44,7 +44,7 @@ func (passager Passager) enjoyRide(exitChannel chan bool, unloadSignal *sync.Con
 		case <-exitChannel:
 			go passager.unboard(unloadSignal, unloadWaitGroup)
 			return
-		case <-time.After((time.Duration(rand.Intn(5)) * time.Second)):
+		case <-time.After((time.Duration(rand.Intn(8-4)+4) * time.Second)):
 			fmt.Printf("%d: %s\n", passager.index, quote)
 		}
 	}

@@ -50,7 +50,7 @@ func (car Car) run() {
 		var passager = <-car.bufferForRide
 		go passager.enjoyRide(exitChannel, car.unloadSignal, car.bufferForUnloadWG)
 	}
-	time.Sleep(10 * time.Second)
+	time.Sleep(8 * time.Second)
 	close(exitChannel)
 	fmt.Println("# - Ride completed")
 }
