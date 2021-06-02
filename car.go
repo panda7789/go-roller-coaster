@@ -31,7 +31,7 @@ func newCar(passagersCount int) Car {
 func (car Car) load() {
 	car.bufferForRideWG.Add(car.passagersCount)
 	car.bufferForUnloadWG.Add(car.passagersCount)
-	fmt.Println("#Boarding started")
+	fmt.Println("# - Boarding started")
 	time.Sleep(2 * time.Second)
 	car.loadSignal.L.Lock()
 	for i := 0; i < car.passagersCount; i++ {
@@ -39,26 +39,29 @@ func (car Car) load() {
 	}
 	car.loadSignal.L.Unlock()
 	car.bufferForRideWG.Wait()
-	fmt.Println("#Boarding completed")
+	fmt.Println("# - Boarding completed")
+	time.Sleep(2 * time.Second)
 }
 
 func (car Car) run() {
 	exitChannel := make(chan bool)
-	fmt.Println("#Ride started")
+	fmt.Println("# - Ride started")
 	for i := 0; i < cap(car.bufferForRide); i++ {
 		var passager = <-car.bufferForRide
 		go passager.enjoyRide(exitChannel, car.unloadSignal, car.bufferForUnloadWG)
 	}
 	time.Sleep(10 * time.Second)
 	close(exitChannel)
-	fmt.Println("#Ride completed")
+	fmt.Println("# - Ride completed")
 }
 
 func (car Car) unload() {
-	fmt.Println("#Unboarding started")
+	fmt.Println("# - Unboarding started")
+	time.Sleep(2 * time.Second)
 	car.unloadSignal.L.Lock()
 	car.unloadSignal.Broadcast()
 	car.unloadSignal.L.Unlock()
 	car.bufferForUnloadWG.Wait()
-	fmt.Println("#Unboarding completed")
+	fmt.Println("# - Unboarding completed")
+	time.Sleep(2 * time.Second)
 }
