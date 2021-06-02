@@ -1,16 +1,28 @@
 package main
 
-import "sync"
+import "fmt"
+
+const passagersInCar = 5
+
+var waitingPlace = make(chan Passager, 20)
+var alreadyRidedPassagers = 0
 
 func main() {
-	var cars [10]*Car
-	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		cars[i] = newCar(&wg)
+	var car Car = newCar(passagersInCar)
+	fillQueue(&car)
+	for alreadyRidedPassagers+car.passagersCount <= cap(waitingPlace) {
+		car.load()
+		car.run()
+		car.unload()
+		fmt.Println("Ride sucesfully completed 😊")
+		alreadyRidedPassagers += car.passagersCount
 	}
-	for _, car := range cars {
-		go car.unload()
+}
+
+func fillQueue(car *Car) {
+	for i := 0; i < cap(waitingPlace); i++ {
+		var pass = Passager{i}
+		go pass.board(car.bufferForRide, car.loadSignal, car.bufferForRideWG)
+		waitingPlace <- pass
 	}
-	wg.Wait()
 }
